@@ -2,9 +2,11 @@
 
 namespace App\Factory;
 
+use App\Entity\CapaChangeRequest;
 use App\Entity\ChangeRequest;
 use App\Enum\Severity;
 use App\Repository\ChangeRequestRepository;
+use Zenstruck\Foundry\Instantiator;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\RepositoryProxy;
@@ -43,6 +45,12 @@ final class ChangeRequestFactory extends ModelFactory
         // see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
         return $this
             // ->afterInstantiate(function (ChangeRequest $ChangeRequest): void {})
+            ->instantiateWith((new Instantiator())->allowExtraAttributes(['additionalDocuments']))
+            ->afterInstantiate(function (ChangeRequest $changeRequest, array $attributes): void {
+                foreach ($attributes['additionalDocuments'] as $additionalDocument) {
+                    $changeRequest->addAdditionalDocument($additionalDocument);
+                }
+            })
         ;
     }
 
